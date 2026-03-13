@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portale Medici — Accesso Documenti</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f2ec;
+      --surface: #ffffff;
+      --ink: #1a1814;
+      --ink-soft: #6b6560;
+      --accent: #c1440e;
+      --accent-dark: #9c3509;
+      --border: #ddd9d0;
+      --success: #2d6a4f;
+    }
+
+    body {
+      font-family: 'EB Garamond', Georgia, serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(193,68,14,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(26,24,20,0.04) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* Decorative lines */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 440px;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      margin-bottom: 1.2rem;
+      position: relative;
+    }
+
+    .logo-mark svg {
+      width: 26px;
+      height: 26px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .header p {
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--ink-soft);
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 2.5rem;
+      box-shadow: 0 2px 24px rgba(26,24,20,0.07), 0 1px 4px rgba(26,24,20,0.05);
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 2rem; right: 2rem;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ink-soft);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Form */
+    .field {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(193,68,14,0.08);
+    }
+
+    .error-msg {
+      display: none;
+      background: #fef2ee;
+      border: 1px solid #f5c4b4;
+      border-radius: 2px;
+      padding: 0.65rem 1rem;
+      font-size: 0.88rem;
+      color: var(--accent-dark);
+      margin-bottom: 1.2rem;
+      font-style: italic;
+    }
+
+    .error-msg.visible { display: block; }
+
+    /* Button */
+    .btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--ink);
+      color: #f5f2ec;
+      border: none;
+      border-radius: 2px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+
+    .btn:hover { background: var(--accent); }
+    .btn:active { transform: scale(0.99); }
+
+    /* Download panel */
+    #download-panel {
+      display: none;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    #download-panel.visible { display: block; }
+
+    .welcome-banner {
+      background: #edf7f1;
+      border: 1px solid #b7deca;
+      border-radius: 2px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .welcome-banner svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--success);
+      fill: none;
+      stroke-width: 2;
+      flex-shrink: 0;
+    }
+
+    .welcome-banner p {
+      font-size: 0.92rem;
+      color: var(--success);
+      font-style: italic;
+    }
+
+    .download-item {
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .download-item:hover {
+      border-color: var(--accent);
+      box-shadow: 0 2px 12px rgba(193,68,14,0.08);
+    }
+
+    .file-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .file-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .file-info { flex: 1; }
+
+    .file-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+
+    .file-desc {
+      font-size: 0.82rem;
+      font-style: italic;
+      color: var(--ink-soft);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .btn-download {
+      padding: 0.55rem 1.1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 2px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-download:hover { background: var(--accent-dark); }
+
+    .logout-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+      font-style: italic;
+      color: var(--ink-soft);
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      transition: color 0.2s, text-decoration-color 0.2s;
+    }
+
+    .logout-link:hover {
+      color: var(--accent);
+      text-decoration-color: var(--accent);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--ink-soft);
+      letter-spacing: 0.05em;
+      opacity: 0.6;
+    }
+
+    /* Shake animation for wrong password */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .shake { animation: shake 0.4s ease; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <h1>Portale Medici</h1>
+    <p>Accesso riservato al personale autorizzato</p>
+  </div>
+
+  <div class="card" id="login-panel">
+    <div class="section-label">Autenticazione</div>
+
+    <div class="field">
+      <label for="username">Utente</label>
+      <input type="text" id="username" placeholder="nome.cognome" autocomplete="username"/>
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+
+    <div class="error-msg" id="error-msg">
+      Credenziali non valide. Riprovare.
+    </div>
+
+    <button class="btn" onclick="doLogin()">Accedi</button>
+  </div>
+
+  <div class="card" id="download-panel">
+    <div class="welcome-banner">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      <p>Accesso effettuato. Benvenuto/a.</p>
+    </div>
+
+    <div class="section-label">Download disponibili</div>
+
+    <div class="download-item">
+      <div class="file-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="1"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+      </div>
+      <div class="file-info">
+        <div class="file-name">Applicazione Documenti</div>
+        <div class="file-desc">Versione corrente — Windows</div>
+      </div>
+      <a class="btn-download" href="https://drive.google.com/drive/folders/1PLFTWFIka_r5vAK3wSEdxYpT7EjSZvt4?usp=sharing" target="_blank">
+        ↓ Scarica
+      </a>
+    </div>
+
+    <span class="logout-link" onclick="doLogout()">Esci dalla sessione</span>
+  </div>
+
+</div>
+
+<div class="footer">© 2025 — Uso interno riservato</div>
+
+<script>
+  // ============================================================
+  // CREDENZIALI — modifica qui per aggiungere/cambiare utenti
+  // ============================================================
+  const USERS = {
+    "medico.necroscopo": "Decesso4554"
+  };
+  // ============================================================
+
+  const loginPanel   = document.getElementById('login-panel');
+  const downloadPanel = document.getElementById('download-panel');
+  const errorMsg     = document.getElementById('error-msg');
+
+  // Mantieni sessione con sessionStorage
+  if (sessionStorage.getItem('auth') === 'ok') showDownload();
+
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('username').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('password').focus();
+  });
+
+  function doLogin() {
+    const user = document.getElementById('username').value.trim().toLowerCase();
+    const pass = document.getElementById('password').value;
+
+    if (USERS[user] && USERS[user] === pass) {
+      sessionStorage.setItem('auth', 'ok');
+      errorMsg.classList.remove('visible');
+      showDownload();
+    } else {
+      errorMsg.classList.add('visible');
+      const card = document.getElementById('login-panel');
+      card.classList.remove('shake');
+      void card.offsetWidth;
+      card.classList.add('shake');
+      document.getElementById('password').value = '';
+    }
+  }
+
+  function showDownload() {
+    loginPanel.style.display = 'none';
+    downloadPanel.classList.add('visible');
+  }
+
+  function doLogout() {
+    sessionStorage.removeItem('auth');
+    downloadPanel.classList.remove('visible');
+    loginPanel.style.display = 'block';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+  }
+</script>
+
+</body>
+</html>
